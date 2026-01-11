@@ -19,7 +19,7 @@ export const useTreeStore = create<TreeStore>((set, get) => ({
     familyData: null,
     expandedNodes: new Set<string>(),
     highlightedNode: null,
-    backgroundColor: 'linear-gradient(to right, #434343 0%, #000000 100%)',
+    backgroundColor: '#111', // Default: Black
 
     setBackgroundColor: (color: string) => set({ backgroundColor: color }),
 

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
+import { toPng, toSvg } from 'html-to-image';
 import { useTreeStore } from '../store';
 import { SearchBar } from './SearchBar';
 
@@ -29,9 +31,64 @@ export function TopMenu({ onResultSelect }: TopMenuProps) {
         ? Math.max(...Object.values(familyData.allPersons).map(p => p.generation))
         : 1;
 
-    // Create array [1, 2, ..., maxGen], excluding 5
     const generations = Array.from({ length: maxGen }, (_, i) => i + 1)
         .filter(gen => gen !== 5);
+
+    const bgOptions = [
+        // Warm Palette
+        { name: 'Amber', value: 'linear-gradient(135deg, #5D2600 0%, #1F0D04 100%)', color: '#5D2600' },
+        { name: 'Espresso', value: 'linear-gradient(135deg, #3E2B26 0%, #1A120B 100%)', color: '#3E2B26' },
+        { name: 'Burgundy', value: 'linear-gradient(135deg, #4A0000 0%, #190A05 100%)', color: '#4A0000' },
+        { name: 'Mauve', value: 'linear-gradient(to right, #41295a, #2f0743)', color: '#41295a' },
+        // Cool/Dark Palette
+        { name: 'Elegant', value: 'linear-gradient(to right, #434343 0%, #000000 100%)', color: '#434343' },
+        { name: 'Cool', value: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)', color: '#203a43' },
+        { name: 'Royal', value: 'linear-gradient(to right, #141e30, #243b55)', color: '#141e30' },
+        { name: 'Purple', value: 'linear-gradient(to right, #240b36, #c31432)', color: '#240b36' },
+        { name: 'Slate', value: '#0f172a', color: '#0f172a' },
+        { name: 'Black', value: '#111', color: '#111' },
+        { name: 'Paper', value: '#f8fafc', color: '#f8fafc' },
+    ];
+
+    const { getNodes } = useReactFlow();
+
+    const downloadImage = (format: 'png' | 'svg') => {
+        const viewport = document.querySelector('.react-flow__viewport');
+        if (!viewport) return;
+
+        const nodes = getNodes();
+        if (nodes.length === 0) return;
+
+        const bounds = getNodesBounds(nodes);
+        const EXPORT_PADDING = 50;
+
+        const imageWidth = bounds.width + (EXPORT_PADDING * 2);
+        const imageHeight = bounds.height + (EXPORT_PADDING * 2);
+
+        const options = {
+            backgroundColor: useTreeStore.getState().backgroundColor.includes('gradient') ? '#111' : useTreeStore.getState().backgroundColor,
+            width: imageWidth,
+            height: imageHeight,
+            style: {
+                width: `${imageWidth}px`,
+                height: `${imageHeight}px`,
+                transform: `translate(${-bounds.x + EXPORT_PADDING}px, ${-bounds.y + EXPORT_PADDING}px)`,
+            },
+        };
+
+        const downloader = format === 'png' ? toPng : toSvg;
+
+        downloader(viewport as HTMLElement, options)
+            .then((dataUrl: string) => {
+                const link = document.createElement('a');
+                link.download = `family-tree.${format}`;
+                link.href = dataUrl;
+                link.click();
+            })
+            .catch((err: Error) => {
+                console.error('Export failed', err);
+            });
+    };
 
     return (
         <>
@@ -111,15 +168,7 @@ export function TopMenu({ onResultSelect }: TopMenuProps) {
                                 BACKGROUND
                             </label>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-                                {[
-                                    { name: 'Cool', value: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)', color: '#203a43' },
-                                    { name: 'Black', value: '#111', color: '#111' },
-                                    { name: 'Slate', value: '#0f172a', color: '#0f172a' },
-                                    { name: 'Elegant', value: 'linear-gradient(to right, #434343 0%, #000000 100%)', color: '#434343' },
-                                    { name: 'Purple', value: 'linear-gradient(to right, #240b36, #c31432)', color: '#240b36' },
-                                    { name: 'Royal', value: 'linear-gradient(to right, #141e30, #243b55)', color: '#141e30' },
-                                    { name: 'Paper', value: '#f8fafc', color: '#f8fafc' },
-                                ].map((bg) => (
+                                {bgOptions.map((bg) => (
                                     <button
                                         key={bg.name}
                                         onClick={() => useTreeStore.getState().setBackgroundColor(bg.value)}
@@ -142,6 +191,45 @@ export function TopMenu({ onResultSelect }: TopMenuProps) {
                                         }}></span>
                                     </button>
                                 ))}
+                            </div>
+                        </div>
+
+                        {/* Export Section */}
+                        <div style={{ marginBottom: '8px', borderTop: '1px solid #333', paddingTop: '8px', width: '100%' }}>
+                            <label style={{ color: '#aaa', fontSize: '9px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                                EXPORT
+                            </label>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                                <button
+                                    onClick={() => downloadImage('png')}
+                                    style={{
+                                        flex: 1,
+                                        background: '#333',
+                                        color: '#fff',
+                                        border: '1px solid #555',
+                                        borderRadius: '4px',
+                                        padding: '6px',
+                                        fontSize: '10px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    PNG
+                                </button>
+                                <button
+                                    onClick={() => downloadImage('svg')}
+                                    style={{
+                                        flex: 1,
+                                        background: '#333',
+                                        color: '#fff',
+                                        border: '1px solid #555',
+                                        borderRadius: '4px',
+                                        padding: '6px',
+                                        fontSize: '10px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    SVG
+                                </button>
                             </div>
                         </div>
 
