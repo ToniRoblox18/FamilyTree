@@ -1,0 +1,98 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+  min-height: 100vh;
+}
+
+/* Loading screen */
+.loading-screen,
+.error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: white;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #14b8a6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ping animation for highlighted nodes */
+@keyframes ping {
+  0% {
+    outline: 3px solid rgba(250, 204, 21, 0);
+    outline-offset: 0;
+  }
+
+  25% {
+    outline: 3px solid rgba(250, 204, 21, 1);
+    outline-offset: 4px;
+  }
+
+  50% {
+    outline: 3px solid rgba(250, 204, 21, 0);
+    outline-offset: 8px;
+  }
+
+  75% {
+    outline: 3px solid rgba(250, 204, 21, 1);
+    outline-offset: 4px;
+  }
+
+  100% {
+    outline: 3px solid rgba(250, 204, 21, 0);
+    outline-offset: 0;
+  }
+}
+
+.family-node.ping {
+  animation: ping 2s ease-out;
+}
+
+/* React Flow customizations */
+/* React Flow customizations */
+/* override moved to component */
+
+.react-flow__controls {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.react-flow__controls-button {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  fill: white !important;
+}
+
+.react-flow__controls-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .react-flow__controls {
+    display: none;
+  }
+}
