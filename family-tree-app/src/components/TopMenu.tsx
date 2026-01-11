@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useReactFlow, getNodesBounds, getViewportForBounds } from '@xyflow/react';
+import { useReactFlow, getNodesBounds } from '@xyflow/react';
 import { toPng, toSvg } from 'html-to-image';
 import { useTreeStore } from '../store';
 import { SearchBar } from './SearchBar';
