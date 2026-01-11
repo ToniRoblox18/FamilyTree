@@ -22,15 +22,7 @@ export function TopMenu({ onResultSelect }: TopMenuProps) {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    // Close if clicked outside (Optional, but user didn't explicitly ask, sticking to ESC/Toggle)
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                // We don't auto-close on click outside for now to avoid conflict with the toggle button
-                // unless we verify the target is NOT the toggle button.
-            }
-        };
-    }, []);
+
 
     // Determine max generation
     const maxGen = familyData
